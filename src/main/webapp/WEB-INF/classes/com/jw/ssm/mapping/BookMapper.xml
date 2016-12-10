@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jw.ssm.dao.IBookDao">
+	<resultMap id="BaseResultMap" type="com.jw.ssm.pojo.Book">
+		<id column="book_id" property="bookId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		book_id, name, description
+  	</sql>
+	<select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from book
+		where book_id = #{bookId,jdbcType=INTEGER}
+	</select>
+	<select id="selectAll" resultMap="BaseResultMap" >
+		select
+		<include refid="Base_Column_List" />
+		from book
+	</select>
+	<!-- 分页SQL -->
+	<select id="selectBooksByPage" resultMap="BaseResultMap">
+		select
+		*
+		from book
+		limit #{startPos},#{pageSize}
+	</select>
+	<!-- 总记录数 -->
+	<select id="getBooksCount" resultType="java.lang.Long">
+		select count(*)	from book
+	</select>
+	<delete id="deleteById" parameterType="java.lang.Integer">
+		delete from book
+		where book_id = #{bookId,jdbcType=INTEGER}
+  	</delete>
+  	<delete id="batchDelete" parameterType="java.util.List">
+  		delete from book where book_id in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">#{item}</foreach>
+  	</delete>
+  	<!-- useGeneratedKeys设置为true表明Mybatis获取由数据库自动生成的主 
+       	键；keyProperty="BookId"指定把获取到的主键值注入到Book的BookId属性
+       	,这里不注入也没有影响，因为表的id会自动增加写入数据库
+     -->
+	<insert id="insert" parameterType="com.jw.ssm.pojo.Book" useGeneratedKeys="true" keyProperty="bookId">
+		
+		insert into book (name, description
+		)
+		values (#{name,jdbcType=VARCHAR},
+		#{description,jdbcType=VARCHAR}
+		)
+  	</insert>
+	<insert id="insertSelective" parameterType="com.jw.ssm.pojo.Book">
+		insert into book
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bookId != null">
+				book_id,
+      		</if>
+			<if test="name != null">
+				name,
+      		</if>
+			<if test="description != null">
+				description,
+      		</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bookId != null">
+				#{bookId,jdbcType=INTEGER},
+      		</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+      		</if>
+			<if test="description != null">
+				#{description,jdbcType=VARCHAR},
+      		</if>
+		</trim>
+	</insert>
+	<update id="updateByIdSelective" parameterType="com.jw.ssm.pojo.Book">
+		update book
+		<set>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+      		</if>
+			<if test="description != null">
+				description = #{description,jdbcType=VARCHAR},
+      		</if>
+		</set>
+		where book_id = #{bookId,jdbcType=INTEGER}
+	</update>
+	<update id="updateById" parameterType="com.jw.ssm.pojo.Book">
+		update book
+		set name = #{name,jdbcType=VARCHAR},
+		description = #{description,jdbcType=VARCHAR}
+		where book_id = #{bookId,jdbcType=INTEGER}
+  	</update>
+</mapper>
